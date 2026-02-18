@@ -15,7 +15,7 @@ COPY oydid/cli/oydid.rb /usr/local/bin/oydid
 RUN chmod 755 /usr/local/bin/oydid
 
 # Copy test script and API app
-COPY test_oydid.py /usr/src/app/test_oydid.py
+COPY tests /usr/src/app/tests
 COPY app /usr/src/app/app
 WORKDIR /usr/src/app
 
