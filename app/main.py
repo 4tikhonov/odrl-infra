@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 import os
 from .routers import dids, vcs, oac
 
@@ -34,6 +34,9 @@ else:
 # Catch-all route for SPA (React Router)
 @app.exception_handler(404)
 async def custom_404_handler(request, __):
+    if request.url.path.startswith("/api"):
+        return JSONResponse(status_code=404, content={"detail": "Not Found"})
+
     # Re-evaluate static_dir in case it wasn't set globally or to be safe
     current_static_dir = None
     if os.path.exists(docker_static_dir):

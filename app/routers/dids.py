@@ -173,6 +173,9 @@ async def share_did(did: str, language: str = Query(None), token: str = Query(No
     Also supports DID format with language tag: did:oyd:...@fr
     """
     # Check for language tag in DID string
+    if "&" in did:
+        did = did.split("&")[0]
+        
     if "@" in did:
         parts = did.split("@")
         did = parts[0]
@@ -260,7 +263,16 @@ async def create_did(request: DidCreateRequest):
 @router.get("/{did}")
 async def read_did(did: str):
     """Read a DID Document"""
+    # Sanitize DID to handle malformed URL params (e.g. &language=fr inside path)
+    if "&" in did:
+        did_original = did
+        did = did.split("&")[0]
+        print(f"DEBUG: Sanitized DID. Original: '{did_original}', Sanitized: '{did}'")
+    else:
+        print(f"DEBUG: DID received (no &): '{did}'")
+
     result = run_oydid_command(["read", did, "--json-output"])
+    print(f"DEBUG: OYDID Read Result: ReturnCode={result.returncode}, Stderr='{result.stderr}', StdoutLen={len(result.stdout)}")
     
     if result.returncode != 0:
         raise HTTPException(status_code=404, detail=f"DID not found or error: {result.stderr}")
