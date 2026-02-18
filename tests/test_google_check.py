@@ -15,7 +15,7 @@ from unittest.mock import patch, MagicMock
 
 def test_google_vc_endpoint():
     print("Testing Google VC Endpoint...")
-    url = "http://localhost:8001/vc/google"
+    url = "http://localhost:8001/api/vc/google"
     
     # 1. Test with invalid token
     payload = {

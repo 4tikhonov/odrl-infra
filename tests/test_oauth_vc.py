@@ -18,7 +18,7 @@ def test_oauth_endpoints():
     
     # GitHub
     print("\n[GitHub]")
-    url_github = "http://localhost:8001/vc/github"
+    url_github = "http://localhost:8001/api/vc/github"
     payload_github = {
         "token": "invalid_gh_token",
         "subject_did": "did:oyd:123"
@@ -36,7 +36,7 @@ def test_oauth_endpoints():
 
     # ORCID
     print("\n[ORCID]")
-    url_orcid = "http://localhost:8001/vc/orcid"
+    url_orcid = "http://localhost:8001/api/vc/orcid"
     payload_orcid = {
         "token": "invalid_orcid_token",
         "orcid": "0000-0000-0000-0000",

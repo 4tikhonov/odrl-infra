@@ -5,7 +5,7 @@ import os
 
 def test_ssh_vc_endpoint():
     print("Testing SSH VC Endpoint...")
-    url = "http://localhost:8001/vc/ssh"
+    url = "http://localhost:8001/api/vc/ssh"
     
     # 1. Generate a temporary SSH key
     key_file = "test_ssh_key"

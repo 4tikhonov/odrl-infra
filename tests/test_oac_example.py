@@ -21,7 +21,7 @@ def test_submit_example():
     # or the user wants to test exactly this file.
     
     try:
-        resp = requests.post(f"{BASE_URL}/oac/policy", json=policy_data)
+        resp = requests.post(f"{BASE_URL}/api/oac/policy", json=policy_data)
         print(f"Status: {resp.status_code}")
         if resp.status_code == 200:
             print("SUCCESS: Policy Created")

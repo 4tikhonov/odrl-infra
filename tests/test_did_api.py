@@ -11,7 +11,7 @@ def test_did_api_lifecycle():
     print("\n[POST] /did/create")
     create_payload = {"payload": {"hello": "world"}}
     try:
-        resp = requests.post(f"{BASE_URL}/did/create", json=create_payload)
+        resp = requests.post(f"{BASE_URL}/api/did/create", json=create_payload)
         if resp.status_code == 200:
             did_doc = resp.json()
             did = did_doc.get("did")
@@ -27,7 +27,7 @@ def test_did_api_lifecycle():
     # 2. Read DID
     print(f"\n[GET] /did/{did}")
     try:
-        resp = requests.get(f"{BASE_URL}/did/{did}")
+        resp = requests.get(f"{BASE_URL}/api/did/{did}")
         if resp.status_code == 200:
             print("SUCCESS: Read DID Document")
         else:
@@ -42,7 +42,7 @@ def test_did_api_lifecycle():
         "payload": {"hello": "updated_world"}
     }
     try:
-        resp = requests.post(f"{BASE_URL}/did/update", json=update_payload)
+        resp = requests.post(f"{BASE_URL}/api/did/update", json=update_payload)
         if resp.status_code == 200:
             updated_doc = resp.json()
             # print(json.dumps(updated_doc, indent=2))
@@ -57,7 +57,7 @@ def test_did_api_lifecycle():
     # 4. Revoke DID
     print(f"\n[DELETE] /did/{did}")
     try:
-        resp = requests.delete(f"{BASE_URL}/did/{did}")
+        resp = requests.delete(f"{BASE_URL}/api/did/{did}")
         if resp.status_code == 200:
             print("SUCCESS: Revoked DID")
         else:

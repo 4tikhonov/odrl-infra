@@ -1,3 +1,12 @@
+# Stage 1: Build Frontend
+FROM node:18-alpine as frontend-build
+WORKDIR /app
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend ./
+RUN npm run build
+
+# Stage 2: Backend & Runtime
 FROM ruby:3.2-alpine
 
 # Install dependencies
@@ -7,8 +16,9 @@ RUN apk add --no-cache libsodium-dev git make gcc musl-dev jq bash curl python3 
     gem install securerandom -v 0.1.1 && \
     gem update
 
-# Install Python dependencies for testing and API
-RUN pip3 install --no-cache --upgrade pip setuptools pytest fastapi uvicorn google-auth requests rdflib --break-system-packages
+# Install Python dependencies
+# Added aiofiles for FastAPI StaticFiles
+RUN pip3 install --no-cache --upgrade pip setuptools pytest fastapi uvicorn google-auth requests rdflib aiofiles --break-system-packages
 
 # Setup OYDID CLI
 COPY oydid/cli/oydid.rb /usr/local/bin/oydid
@@ -17,6 +27,10 @@ RUN chmod 755 /usr/local/bin/oydid
 # Copy test script and API app
 COPY tests /usr/src/app/tests
 COPY app /usr/src/app/app
+
+# Copy Frontend Build Artifacts
+COPY --from=frontend-build /app/dist /usr/src/app/app/static
+
 WORKDIR /usr/src/app
 
 # Default command matches docker-compose, but useful if run standalone

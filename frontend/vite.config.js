@@ -23,10 +23,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/did': 'http://localhost:8001',
-      '/oac': 'http://localhost:8001',
-      '/vc': 'http://localhost:8001',
-      '/health': 'http://localhost:8001'
+      '/api': {
+        target: 'http://localhost:8001',
+        changeOrigin: true,
+      }
     }
   }
 })

@@ -30,7 +30,7 @@ def test_oac_policy():
     }
     
     try:
-        resp = requests.post(f"{BASE_URL}/oac/policy", json=preference_policy)
+        resp = requests.post(f"{BASE_URL}/api/oac/policy", json=preference_policy)
         print(f"Status: {resp.status_code}")
         if resp.status_code == 200:
             print("SUCCESS: Created Preference Policy")
@@ -43,7 +43,7 @@ def test_oac_policy():
     # 2. Get Created Policy
     print("\n[GET] /oac/policy/ex:preference1")
     try:
-        resp = requests.get(f"{BASE_URL}/oac/policy/ex:preference1")
+        resp = requests.get(f"{BASE_URL}/api/oac/policy/ex:preference1")
         if resp.status_code == 200:
             print("SUCCESS: Retrieved Policy")
         else:
@@ -59,7 +59,7 @@ def test_oac_policy():
         "odrl:permission": []
     }
     try:
-        resp = requests.post(f"{BASE_URL}/oac/policy", json=invalid_policy)
+        resp = requests.post(f"{BASE_URL}/api/oac/policy", json=invalid_policy)
         print(f"Status: {resp.status_code}")
         if resp.status_code == 422:
             print("SUCCESS: Validation caught missing UID")
