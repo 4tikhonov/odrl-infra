@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Play, CheckCircle, Circle, ArrowRight, FileJson, Loader2 } from 'lucide-react';
+import { Play, CheckCircle, Circle, ArrowRight, FileJson, Loader2, ExternalLink } from 'lucide-react';
 import api from '../services/api';
 import { cn } from '../lib/utils';
 
@@ -10,6 +10,21 @@ const SCENARIO_STEPS = [
     { id: 'policy', label: 'Create ODRL Offer', description: 'Alice offers Bob permission to "play" the movie' },
     { id: 'verify', label: 'Verify Policy', description: 'Retrieve and validate the created policy' },
 ];
+
+const ResolverLink = ({ did }) => {
+    if (!did) return null;
+    return (
+        <a
+            href={`https://dev.uniresolver.io/1.0/identifiers/${did}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1 dark:text-blue-400 dark:hover:text-blue-300"
+            title="View on Universal Resolver"
+        >
+            {did} <ExternalLink size={12} />
+        </a>
+    );
+};
 
 export default function Demo() {
     const [activeStep, setActiveStep] = useState(-1);
@@ -30,6 +45,7 @@ export default function Demo() {
             const assignerDid = assignerRes.data.did;
             setResults(prev => ({ ...prev, assigner: assignerRes.data }));
             addLog(`Assigner Created: ${assignerDid}`);
+            console.log("Assigner Result:", assignerRes.data);
             setActiveStep(1);
 
             // Step 2: Create Assignee
@@ -47,7 +63,7 @@ export default function Demo() {
             const policyPayload = {
                 "@context": "https://www.w3.org/ns/odrl.jsonld",
                 "type": "Offer",
-                "uid": `urn:uuid:${crypto.randomUUID()}`,
+                "uid": `did:oyd:${crypto.randomUUID()}`,
                 "profile": "http://example.com/odrl:profile:01",
                 "permission": [{
                     "target": "http://example.com/movie/123",
@@ -58,6 +74,7 @@ export default function Demo() {
             };
             const policyRes = await api.post('/oac/policy', policyPayload);
             setResults(prev => ({ ...prev, policy: policyRes.data }));
+            console.log("Policy Result:", policyRes.data);
             addLog(`Policy Created! UID: ${policyRes.data.uid}`);
             setActiveStep(3);
 
@@ -153,13 +170,13 @@ export default function Demo() {
                                 {results.assigner && (
                                     <div className="bg-white p-4 rounded-lg border border-indigo-200 animate-in fade-in slide-in-from-bottom-4 dark:bg-[#242424] dark:border-indigo-500/30">
                                         <h5 className="text-xs text-indigo-600 font-bold uppercase mb-2 dark:text-indigo-400">Assigner (Alice)</h5>
-                                        <p className="font-mono text-xs break-all text-gray-700 dark:text-gray-300">{results.assigner.did}</p>
+                                        <p className="font-mono text-xs break-all text-gray-700 dark:text-gray-300"><ResolverLink did={results.assigner.did} /></p>
                                     </div>
                                 )}
                                 {results.assignee && (
                                     <div className="bg-white p-4 rounded-lg border border-cyan-200 animate-in fade-in slide-in-from-bottom-4 dark:bg-[#242424] dark:border-cyan-500/30">
                                         <h5 className="text-xs text-cyan-600 font-bold uppercase mb-2 dark:text-cyan-400">Assignee (Bob)</h5>
-                                        <p className="font-mono text-xs break-all text-gray-700 dark:text-gray-300">{results.assignee.did}</p>
+                                        <p className="font-mono text-xs break-all text-gray-700 dark:text-gray-300"><ResolverLink did={results.assignee.did} /></p>
                                     </div>
                                 )}
                             </div>
@@ -172,6 +189,14 @@ export default function Demo() {
                                     <span>Generated Policy</span>
                                     <span className="text-[10px] bg-purple-100 px-2 py-0.5 rounded text-purple-700 dark:bg-purple-500/20 dark:text-purple-300">Offer</span>
                                 </h5>
+                                <div className="mb-2">
+                                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">UID: </span>
+                                    {(results.policy.uid || results.policy['odrl:uid']) ? (
+                                        <ResolverLink did={results.policy.uid || results.policy['odrl:uid']} />
+                                    ) : (
+                                        <span className="text-red-500 text-xs">UID missing</span>
+                                    )}
+                                </div>
                                 <pre className="font-mono text-xs text-gray-700 overflow-x-auto dark:text-gray-300">
                                     {JSON.stringify(results.policy, null, 2)}
                                 </pre>
@@ -184,7 +209,15 @@ export default function Demo() {
                                 <h5 className="text-xs text-green-600 font-bold uppercase mb-2 flex items-center gap-2 dark:text-green-400">
                                     <CheckCircle size={14} /> Verification Check
                                 </h5>
-                                <p className="text-sm text-gray-700 dark:text-gray-300">Successfully retrieved policy <code>{results.verify.uid}</code> from the ODRL store. The policy is valid and active.</p>
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                    Successfully retrieved policy
+                                    {(results.verify['odrl:uid'] || results.verify.uid) ? (
+                                        <ResolverLink did={results.verify['odrl:uid'] || results.verify.uid} />
+                                    ) : (
+                                        <code>UNKNOWN_UID</code>
+                                    )}
+                                    from the ODRL store. The policy is valid and active.
+                                </p>
                             </div>
                         )}
                     </div>

@@ -4,6 +4,8 @@ import { Mail, Github, Terminal, Fingerprint, ChevronRight, CheckCircle, AlertCi
 import api from '../services/api';
 import { cn } from '../lib/utils';
 
+import { OAUTH_CONFIG } from '../config';
+
 const VC_TYPES = [
     { id: 'google', name: 'Google Account', icon: Mail, description: 'Prove ownership of a Google email address.', endpoint: '/vc/google' },
     { id: 'github', name: 'GitHub Account', icon: Github, description: 'Prove ownership of a GitHub username.', endpoint: '/vc/github' },
@@ -33,6 +35,27 @@ export default function VcWallet() {
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSocialLogin = (provider) => {
+        const config = OAUTH_CONFIG[provider];
+        if (!config) return;
+
+        const params = new URLSearchParams({
+            client_id: config.clientId,
+            redirect_uri: config.redirectUri,
+            response_type: 'token', // or 'code' depending on flow, using token for implicit demo or code for backend exchange
+            scope: config.scope,
+            state: 'random_state_string', // Should be random for security
+        });
+
+        // Google uses 'response_type=id_token' for OIDC if not using code flow
+        if (provider === 'google') {
+            params.set('response_type', 'id_token');
+            params.set('nonce', 'random_nonce');
+        }
+
+        window.open(`${config.authUrl}?${params.toString()}`, '_blank', 'width=500,height=600');
     };
 
     return (
@@ -98,7 +121,16 @@ export default function VcWallet() {
 
                                 {selectedType === 'google' && (
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Google ID Token</label>
+                                        <div className="flex justify-between items-center mb-1">
+                                            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">Google ID Token</label>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleSocialLogin('google')}
+                                                className="text-xs bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1 rounded border border-red-200 transition-colors dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/30"
+                                            >
+                                                Connect Google Account
+                                            </button>
+                                        </div>
                                         <textarea
                                             name="token"
                                             rows={4}
@@ -113,7 +145,16 @@ export default function VcWallet() {
 
                                 {selectedType === 'github' && (
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">GitHub Access Token</label>
+                                        <div className="flex justify-between items-center mb-1">
+                                            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">GitHub Access Token</label>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleSocialLogin('github')}
+                                                className="text-xs bg-gray-100 text-gray-700 hover:bg-gray-200 px-2 py-1 rounded border border-gray-300 transition-colors dark:bg-white/10 dark:text-gray-300 dark:border-white/20 dark:hover:bg-white/20"
+                                            >
+                                                Connect GitHub Account
+                                            </button>
+                                        </div>
                                         <input
                                             name="token"
                                             type="password"
@@ -129,7 +170,16 @@ export default function VcWallet() {
                                 {selectedType === 'orcid' && (
                                     <>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">ORCID iD</label>
+                                            <div className="flex justify-between items-center mb-1">
+                                                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400">ORCID iD</label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleSocialLogin('orcid')}
+                                                    className="text-xs bg-green-50 text-green-600 hover:bg-green-100 px-2 py-1 rounded border border-green-200 transition-colors dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/30"
+                                                >
+                                                    Connect ORCID
+                                                </button>
+                                            </div>
                                             <input
                                                 name="orcid"
                                                 placeholder="0000-0000-0000-0000"

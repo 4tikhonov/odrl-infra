@@ -7,7 +7,7 @@ import { cn } from '../lib/utils';
 export default function PolicyBuilder() {
     const [formData, setFormData] = useState({
         type: 'Offer',
-        uid: `urn:uuid:${crypto.randomUUID()}`,
+        uid: `did:oyd:${crypto.randomUUID()}`,
         assigner: '',
         assignee: '',
         target: '',
@@ -62,7 +62,7 @@ export default function PolicyBuilder() {
     };
 
     const refreshUid = () => {
-        setFormData(prev => ({ ...prev, uid: `urn:uuid:${crypto.randomUUID()}` }));
+        setFormData(prev => ({ ...prev, uid: `did:oyd:${crypto.randomUUID()}` }));
     };
 
     const policyJson = generateJson();
