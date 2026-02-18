@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Wallet, ShieldCheck, FileKey, Menu, Play } from 'lucide-react';
+import { LayoutDashboard, Wallet, ShieldCheck, FileKey, Menu, Play, MessageSquare } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -43,6 +43,7 @@ export default function Layout({ children }) {
                     <NavItem to="/dids" icon={FileKey} label="DID Manager" />
                     <NavItem to="/vcs" icon={Wallet} label="VC Wallet" />
                     <NavItem to="/policies" icon={ShieldCheck} label="Policy Builder" />
+                    <NavItem to="/prompts" icon={MessageSquare} label="Prompts Manager" />
                     <div className="h-px bg-gray-200 dark:bg-white/10 my-2" />
                     <NavItem to="/demo" icon={Play} label="Live Demo" />
                 </nav>

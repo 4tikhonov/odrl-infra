@@ -7,6 +7,7 @@ import DidManager from './pages/DidManager';
 import VcWallet from './pages/VcWallet';
 import PolicyBuilder from './pages/PolicyBuilder';
 import Demo from './pages/Demo';
+import PromptsManager from './pages/PromptsManager';
 
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -23,6 +24,7 @@ function App() {
               <Route path="/dids" element={<DidManager />} />
               <Route path="/vcs" element={<VcWallet />} />
               <Route path="/policies" element={<PolicyBuilder />} />
+              <Route path="/prompts" element={<PromptsManager />} />
               <Route path="/demo" element={<Demo />} />
             </Routes>
           </Layout>

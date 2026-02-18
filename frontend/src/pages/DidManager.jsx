@@ -26,9 +26,12 @@ const Tabs = ({ active, onChange, options }) => (
     </div>
 );
 
+import { useSearchParams } from 'react-router-dom';
+
 export default function DidManager() {
+    const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState('resolve');
-    const [didInput, setDidInput] = useState('');
+    const [didInput, setDidInput] = useState(searchParams.get('resolve') || '');
     const [createPayload, setCreatePayload] = useState('{\n  "hello": "world"\n}');
     const [bookmarkUrl, setBookmarkUrl] = useState('');
     const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('did_history') || '[]'));
@@ -37,6 +40,14 @@ export default function DidManager() {
         localStorage.setItem('did_history', JSON.stringify(history));
     }, [history]);
 
+    useEffect(() => {
+        const resolveParam = searchParams.get('resolve');
+        if (resolveParam) {
+            setDidInput(resolveParam);
+            resolveMutation.mutate(resolveParam);
+        }
+    }, [searchParams]);
+
     // Correction for slice
     const safeAddToHistory = (did, type) => {
         setHistory(prev => {
@@ -44,6 +55,8 @@ export default function DidManager() {
             return [{ did, type, timestamp: Date.now() }, ...filtered].slice(0, 10);
         });
     }
+
+
 
     // --- Queries & Mutations ---
 
