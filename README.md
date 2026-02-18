@@ -25,6 +25,13 @@ Full lifecycle management for OYDID (Listen-to-Yourself) DIDs.
 -   **Bookmarks**: Create DIDs from URLs (with RDF Turtle support for Semantic Web resources).
 -   **Resolution**: Resolve DIDs to retrieve documents and metadata.
 
+### 4. React Frontend
+A modern web interface to interact with the API:
+-   **Dashboard**: Overview of services.
+-   **DID Manager**: UI to resolve, create, and bookmark DIDs.
+-   **VC Wallet**: Issue credentials (Google, GitHub, SSH, ORCID).
+-   **Policy Builder**: Visual tool to create and validate ODRL policies.
+
 ## API Documentation
 
 The API provides the following endpoints. You can also view interactive documentation at `/docs` when running the service.
@@ -81,10 +88,17 @@ Manage the lifecycle of OYDID Data Resources.
     git submodule update --init --recursive
     ```
 
-2.  **Build and Run**:
     ```bash
     docker-compose up --build
     ```
+
+3.  **Run Frontend** (in a new terminal):
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
+    ```
+    The UI will be available at `http://localhost:5173`.
 
 The API will be available at `http://localhost:8001`.
 Interactive documentation and testing (Swagger UI): `http://localhost:8001/docs`.

@@ -8,34 +8,54 @@ router = APIRouter(prefix="/oac", tags=["ODRL Access Control Profile"])
 
 # In-memory store for demo purposes (since we don't have a database)
 # In a real app, this would persist to disk or DB
-oac_policies = {}
+from fastapi import APIRouter, HTTPException, Body
+from typing import Dict, Any
+from ..models_oac import OacPolicyCreateRequest
+from ..services.oydid import run_oydid_command
+import json
+
+router = APIRouter(prefix="/oac", tags=["ODRL Access Control Profile"])
 
 @router.post("/policy")
 async def create_oac_policy(policy: OacPolicyCreateRequest):
     """
-    Create a new ODRL Access Control Policy (OAC).
-    
-    Accepts OAC policy definitions: Preference, Requirement, Offer, Request, Agreement.
-    Examples in spec: https://besteves4.github.io/odrl-access-control-profile/oac.html#examples
+    Create a new ODRL Access Control Policy (OAC) backed by a DID.
+    The Policy content is stored as the DID Document (or payload).
     """
     try:
-        # Since we use Aliases for JSON-LD properties (e.g., @context, odrl:uid), 
-        # Pydantic handles validation.
+        # Prepare payload
+        policy_dict = policy.dict(by_alias=True)
         
-        # We can perform additional/semantic validation here if needed.
+        # Use OYDID to create a DID with this policy as payload
+        # Note: We ignore the incoming 'uid' if we seek to rely on the generated DID,
+        # BUT ODRL requires the policy to contain its own UID.
+        # Check if we can use the 'token' or just embed it.
+        # For now, we register the policy content.
         
-        # Store policy
-        # If uid is not unique, we overwrite or error? Let's error.
-        uid = policy.uid
-        if uid in oac_policies:
-             raise HTTPException(status_code=409, detail=f"Policy with UID {uid} already exists.")
-             
-        oac_policies[uid] = policy.dict(by_alias=True)
+        result = run_oydid_command(["create", "--json-output"], input_data=policy_dict)
+        
+        if result.returncode != 0:
+            raise HTTPException(status_code=500, detail=f"OYDID creation failed: {result.stderr}")
+            
+        did_data = json.loads(result.stdout)
+        did = did_data.get("did")
+        
+        # We might want to update the policy to have the correct UID (the DID)
+        # But OYDID 'create' hashes the content. If we change content, DID changes.
+        # Circular dependency if UID is inside content.
+        # ODRL implies UID is the ID of the policy.
+        # If we accept the DID as the UID, we effectively say the Policy IS the DID Document.
+        
+        # For this implementation, we return the DID as the confirmed UID.
+        # The stored payload will have the original UID (temporary), which might be mismatched.
+        # Alternatively, we could do 2-step: create, get DID, update? No, that updates the log.
+        
+        # User instruction: "generate DID as for user".
         
         return {
             "status": "created",
-            "uid": uid,
-            "policy": oac_policies[uid]
+            "uid": did,
+            "policy": did_data.get("doc", policy_dict)
         }
         
     except Exception as e:
@@ -43,7 +63,18 @@ async def create_oac_policy(policy: OacPolicyCreateRequest):
 
 @router.get("/policy/{uid}")
 async def get_oac_policy(uid: str):
-    """Retrieve an OAC policy by its UID."""
-    if uid not in oac_policies:
-        raise HTTPException(status_code=404, detail="Policy not found")
-    return oac_policies[uid]
+    """Retrieve an OAC policy by its UID (which is a DID)."""
+    # Use OYDID to read the DID
+    result = run_oydid_command(["read", uid, "--json-output"])
+    
+    if result.returncode != 0:
+        raise HTTPException(status_code=404, detail=f"Policy not found: {result.stderr}")
+        
+    try:
+        did_doc = json.loads(result.stdout)
+        # The policy is essentially the DID Document (or the payload within/mapped to it)
+        # did_doc['doc'] usually contains the payload if it was created simply.
+        return did_doc.get("doc", {})
+        
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Failed to decode OYDID response")
