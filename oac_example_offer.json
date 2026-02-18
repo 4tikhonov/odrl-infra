@@ -1,0 +1,43 @@
+{
+    "@context": "https://w3id.org/oac/context.json",
+    "type": "Offer",
+    "odrl:uid": "ex:offer1",
+    "odrl:profile": "oac:",
+    "dcterms:description": "Offer to read identifier data for identity verification and behavioral data for research and development",
+    "dcterms:creator": "ex:userA",
+    "dcterms:issued": "2022-11-08T17:26:35",
+    "dcterms:source": [
+        "ex:preference1",
+        "ex:requirement1"
+    ],
+    "odrl:permission": [
+        {
+            "assigner": "ex:userA",
+            "target": "oac:Behavioral",
+            "action": "oac:Read",
+            "constraint": [
+                {
+                    "title": "Purpose for access is to conduct research and development.",
+                    "leftOperand": "oac:Purpose",
+                    "operator": "odrl:isA",
+                    "rightOperand": "dpv:ResearchAndDevelopment"
+                }
+            ],
+            "hasContext": "dpv:Optional"
+        },
+        {
+            "assigner": "ex:userA",
+            "target": "oac:Identifier",
+            "action": "oac:Read",
+            "constraint": [
+                {
+                    "title": "Purpose for access is to verify the identity of the assigner.",
+                    "leftOperand": "oac:Purpose",
+                    "operator": "odrl:isA",
+                    "rightOperand": "dpv:IdentityVerification"
+                }
+            ],
+            "hasContext": "dpv:Required"
+        }
+    ]
+}
