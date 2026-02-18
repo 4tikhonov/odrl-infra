@@ -29,7 +29,8 @@ COPY tests /usr/src/app/tests
 COPY app /usr/src/app/app
 
 # Copy Frontend Build Artifacts
-COPY --from=frontend-build /app/dist /usr/src/app/app/static
+# Copy to a location outside /usr/src/app to avoid volume masking
+COPY --from=frontend-build /app/dist /frontend_dist
 
 WORKDIR /usr/src/app
 
