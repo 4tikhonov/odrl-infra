@@ -96,7 +96,7 @@ export default function Demo() {
             const policyPayload = {
                 "@context": "https://www.w3.org/ns/odrl.jsonld",
                 "type": "Offer",
-                "uid": `did:oyd:${crypto.randomUUID()}`,
+                "uid": `${crypto.randomUUID()}`,
                 "profile": "http://example.com/odrl:profile:01",
                 "permission": [{
                     "target": "http://example.com/movie/123",
@@ -310,7 +310,7 @@ export default function Demo() {
                                 {results.policy && (
                                     <div className="bg-white p-4 rounded-lg border border-purple-200 animate-in fade-in slide-in-from-bottom-4 dark:bg-[#242424] dark:border-purple-500/30">
                                         <h5 className="text-xs text-purple-600 font-bold uppercase mb-2">Policy UID</h5>
-                                        <div className="mb-2"><ResolverLink did={results.policy.uid || results.policy['did:oyd']} /></div>
+                                        <div className="mb-2"><ResolverLink did={results.policy.uid || results.policy['odrl:uid']} /></div>
                                         <pre className="font-mono text-xs text-gray-700 overflow-x-auto dark:text-gray-300">{JSON.stringify(results.policy, null, 2)}</pre>
                                     </div>
                                 )}

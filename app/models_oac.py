@@ -29,7 +29,7 @@ class OacPermission(OacBaseModel):
 class OacPolicy(OacBaseModel):
     context: Union[str, List[str]] = Field(default=[ODRL_CONTEXT], alias="@context")
     type: str = Field(..., description="Type of policy: Preference, Requirement, Offer, Request, Agreement")
-    uid: str = Field(..., alias="did:oyd", description="Unique identifier for the policy")
+    uid: str = Field(..., alias="odrl:uid", description="Unique identifier for the policy")
     profile: Optional[str] = Field(default="oac:", alias="odrl:profile")
     description: Optional[str] = Field(None, alias="dcterms:description")
     creator: Optional[str] = Field(None, alias="dcterms:creator")
