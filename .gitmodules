@@ -1,0 +1,3 @@
+[submodule "oydid"]
+	path = oydid
+	url = https://github.com/OwnYourData/oydid

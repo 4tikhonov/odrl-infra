@@ -11,7 +11,7 @@ RUN apk add --no-cache libsodium-dev git make gcc musl-dev jq bash curl python3 
 RUN pip3 install --no-cache --upgrade pip setuptools pytest fastapi uvicorn google-auth requests rdflib --break-system-packages
 
 # Setup OYDID CLI
-COPY cli/oydid.rb /usr/local/bin/oydid
+COPY oydid/cli/oydid.rb /usr/local/bin/oydid
 RUN chmod 755 /usr/local/bin/oydid
 
 # Copy test script and API app
