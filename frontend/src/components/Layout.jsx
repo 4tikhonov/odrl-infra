@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Wallet, ShieldCheck, FileKey, Menu, Play, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Wallet, ScrollText, PlayCircle, Sun, Moon, LogOut, CheckCircle, Menu, X, FileText, Database, ShieldCheck, FileKey, Play, MessageSquare } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -14,8 +14,8 @@ const NavItem = ({ to, icon: Icon, label }) => {
             className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
                 isActive
-                    ? "bg-indigo-600 text-white shadow-md dark:bg-indigo-600"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-white/10 dark:hover:text-white"
+                    ? "bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:ring-indigo-500/40"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200"
             )}
         >
             <Icon size={20} />
@@ -44,6 +44,7 @@ export default function Layout({ children }) {
                     <NavItem to="/vcs" icon={Wallet} label="VC Wallet" />
                     <NavItem to="/policies" icon={ShieldCheck} label="Policy Builder" />
                     <NavItem to="/prompts" icon={MessageSquare} label="Prompts Manager" />
+                    <NavItem to="/variables" icon={Database} label="Variables" />
                     <div className="h-px bg-gray-200 dark:bg-white/10 my-2" />
                     <NavItem to="/demo" icon={Play} label="Live Demo" />
                 </nav>

@@ -8,6 +8,7 @@ import VcWallet from './pages/VcWallet';
 import PolicyBuilder from './pages/PolicyBuilder';
 import Demo from './pages/Demo';
 import PromptsManager from './pages/PromptsManager';
+import VariablesManager from './pages/VariablesManager';
 
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -25,6 +26,7 @@ function App() {
               <Route path="/vcs" element={<VcWallet />} />
               <Route path="/policies" element={<PolicyBuilder />} />
               <Route path="/prompts" element={<PromptsManager />} />
+              <Route path="/variables" element={<VariablesManager />} />
               <Route path="/demo" element={<Demo />} />
             </Routes>
           </Layout>
