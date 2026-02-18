@@ -195,7 +195,7 @@ export default function Demo() {
     return (
         <div className="max-w-6xl mx-auto h-[calc(100vh-140px)] flex flex-col">
             <div className="mb-6">
-                <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Live Demo Workflows</h2>
+                <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Live Demo: FAIR for Open Digital Rights Language</h2>
                 <p className="text-gray-500 dark:text-gray-400">Automated end-to-end verification of ODRL policies and DID artifacts.</p>
             </div>
 
