@@ -7,10 +7,12 @@ COPY frontend ./
 RUN npm run build
 
 # Stage 2: Backend & Runtime
-FROM ruby:3.2-alpine
+FROM ruby:3.2-slim
 
 # Install dependencies
-RUN apk add --no-cache libsodium-dev git make gcc musl-dev jq bash curl python3 py3-pip openssh && \
+RUN apt-get update && apt-get install -y \
+    libsodium-dev git make gcc libc-dev jq bash curl python3 python3-pip openssh-client && \
+    rm -rf /var/lib/apt/lists/* && \
     gem install httparty ed25519 multibases multihashes multicodecs optparse rbnacl dag uri oydid && \
     gem install json-canonicalization -v 0.2.1 && \
     gem install securerandom -v 0.1.1 && \
@@ -18,7 +20,7 @@ RUN apk add --no-cache libsodium-dev git make gcc musl-dev jq bash curl python3 
 
 # Install Python dependencies
 # Added aiofiles for FastAPI StaticFiles
-RUN pip3 install --no-cache --upgrade pip setuptools pytest fastapi uvicorn google-auth requests rdflib aiofiles --break-system-packages
+RUN pip3 install --no-cache pytest fastapi uvicorn google-auth requests rdflib aiofiles qdrant-client fastembed --break-system-packages
 
 # Setup OYDID CLI
 COPY oydid/cli/oydid.rb /usr/local/bin/oydid

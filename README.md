@@ -31,10 +31,11 @@ A modern web interface to interact with the API:
 -   **DID Manager**: UI to resolve, create, and bookmark DIDs.
 -   **VC Wallet**: Issue credentials (Google, GitHub, SSH, ORCID).
 -   **Policy Builder**: Visual tool to create and validate ODRL policies.
+-   **Prompts Manager**: Anchor LLM prompts as immutable DIDs.
 
 ## API Documentation
 
-The API provides the following endpoints. You can also view interactive documentation at `/docs` when running the service.
+The API provides the following endpoints. You can also view interactive documentation at `/api/docs` when running the service.
 
 ### 1. ODRL Access Control (`/oac`)
 
@@ -88,20 +89,17 @@ Manage the lifecycle of OYDID Data Resources.
     git submodule update --init --recursive
     ```
 
+2.  **Run with Docker Compose**:
     ```bash
-    docker-compose up --build
+    docker compose up --build
     ```
 
-3.  **Run Frontend** (in a new terminal):
-    ```bash
-    cd frontend
-    npm install
-    npm run dev
-    ```
-    The UI will be available at `http://localhost:5173`.
+    The service will start on `http://localhost:8001`:
+    -   **Frontend**: [http://localhost:8001/](http://localhost:8001/)
+    -   **API Docs**: [http://localhost:8001/api/docs](http://localhost:8001/api/docs)
+    -   **Health Check**: [http://localhost:8001/api/health](http://localhost:8001/api/health)
 
-The API will be available at `http://localhost:8001`.
-Interactive documentation and testing (Swagger UI): `http://localhost:8001/docs`.
+    *Note: The frontend is built and served directly by the FastAPI container.*
 
 ## Architecture
 -   **FastAPI**: Provides the REST API layer.

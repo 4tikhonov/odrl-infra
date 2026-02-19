@@ -12,6 +12,7 @@ from fastapi import APIRouter, HTTPException, Body
 from typing import Dict, Any
 from ..models_oac import OacPolicyCreateRequest
 from ..services.oydid import run_oydid_command
+from ..services.qdrant_service import qdrant_service
 import json
 
 router = APIRouter(prefix="/oac", tags=["ODRL Access Control Profile"])
@@ -52,6 +53,12 @@ async def create_oac_policy(policy: OacPolicyCreateRequest):
         
         # User instruction: "generate DID as for user".
         
+        # Store in Qdrant
+        try:
+            qdrant_service.upsert_document(did, policy_dict)
+        except Exception as e:
+            print(f"Warning: Failed to store in Qdrant: {e}")
+            
         return {
             "status": "created",
             "uid": did,
@@ -78,3 +85,15 @@ async def get_oac_policy(uid: str):
         
     except json.JSONDecodeError:
         raise HTTPException(status_code=500, detail="Failed to decode OYDID response")
+
+@router.get("/search")
+async def search_oac_policies(q: str):
+    """
+    Search for OAC policies/DIDs in Qdrant based on keywords.
+    Returns both DID and JSON-LD with similarity measure.
+    """
+    try:
+        results = qdrant_service.search_documents(q)
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")

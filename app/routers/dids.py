@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from ..models import DidCreateRequest, DidUpdateRequest
 from ..services.oydid import run_oydid_command
+from ..services.qdrant_service import qdrant_service
 import json
 import requests
 import re
@@ -153,9 +154,16 @@ async def create_did_from_url(url: str, token: str = Query(None, description="Op
             raise HTTPException(status_code=500, detail=f"OYDID creation failed: {result.stderr}")
             
         did_data = json.loads(result.stdout)
+        did = did_data.get("did")
+        
+        # Store in Qdrant
+        try:
+            qdrant_service.upsert_document(did, payload)
+        except Exception as e:
+            print(f"Warning: Failed to store in Qdrant: {e}")
         
         return {
-            "did": did_data.get("did"),
+            "did": did,
             "doc": did_data.get("doc"),
             "stored_payload": payload
         }
@@ -256,7 +264,16 @@ async def create_did(request: DidCreateRequest):
         raise HTTPException(status_code=400, detail=f"OYDID Error: {result.stderr}")
         
     try:
-        return json.loads(result.stdout)
+        did_data = json.loads(result.stdout)
+        did = did_data.get("did")
+        
+        # Store in Qdrant
+        try:
+            qdrant_service.upsert_document(did, request.payload)
+        except Exception as e:
+            print(f"Warning: Failed to store in Qdrant: {e}")
+            
+        return did_data
     except json.JSONDecodeError:
         return {"raw_output": result.stdout}
 
