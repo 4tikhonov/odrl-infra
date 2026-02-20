@@ -1,15 +1,5 @@
-from fastapi import APIRouter, HTTPException, Body
-from typing import Dict, Any
-from ..models_oac import OacPolicyCreateRequest
-import json
-import uuid
-
-router = APIRouter(prefix="/oac", tags=["ODRL Access Control Profile"])
-
-# In-memory store for demo purposes (since we don't have a database)
-# In a real app, this would persist to disk or DB
-from fastapi import APIRouter, HTTPException, Body
-from typing import Dict, Any
+from fastapi import APIRouter, HTTPException, Body, Query
+from typing import Dict, Any, List, Optional
 from ..models_oac import OacPolicyCreateRequest
 from ..services.oydid import run_oydid_command
 from ..services.qdrant_service import qdrant_service
@@ -28,11 +18,6 @@ async def create_oac_policy(policy: OacPolicyCreateRequest):
         policy_dict = policy.dict(by_alias=True)
         
         # Use OYDID to create a DID with this policy as payload
-        # Note: We ignore the incoming 'uid' if we seek to rely on the generated DID,
-        # BUT ODRL requires the policy to contain its own UID.
-        # Check if we can use the 'token' or just embed it.
-        # For now, we register the policy content.
-        
         result = run_oydid_command(["create", "--json-output"], input_data=policy_dict)
         
         if result.returncode != 0:
@@ -41,19 +26,7 @@ async def create_oac_policy(policy: OacPolicyCreateRequest):
         did_data = json.loads(result.stdout)
         did = did_data.get("did")
         
-        # We might want to update the policy to have the correct UID (the DID)
-        # But OYDID 'create' hashes the content. If we change content, DID changes.
-        # Circular dependency if UID is inside content.
-        # ODRL implies UID is the ID of the policy.
-        # If we accept the DID as the UID, we effectively say the Policy IS the DID Document.
-        
-        # For this implementation, we return the DID as the confirmed UID.
-        # The stored payload will have the original UID (temporary), which might be mismatched.
-        # Alternatively, we could do 2-step: create, get DID, update? No, that updates the log.
-        
-        # User instruction: "generate DID as for user".
-        
-        # Store in Qdrant
+        # Store in Qdrant (auto-routes to 'policy' collection)
         try:
             qdrant_service.upsert_document(did, policy_dict)
         except Exception as e:
@@ -79,21 +52,25 @@ async def get_oac_policy(uid: str):
         
     try:
         did_doc = json.loads(result.stdout)
-        # The policy is essentially the DID Document (or the payload within/mapped to it)
-        # did_doc['doc'] usually contains the payload if it was created simply.
         return did_doc.get("doc", {})
         
     except json.JSONDecodeError:
         raise HTTPException(status_code=500, detail="Failed to decode OYDID response")
 
 @router.get("/search")
-async def search_oac_policies(q: str):
+async def search_oac_policies(
+    q: str, 
+    collection: Optional[str] = Query(None, description="Qdrant collection to search in (policy, prompts, variables, croissant, dids)")
+):
     """
-    Search for OAC policies/DIDs in Qdrant based on keywords.
+    Search for DIDs in Qdrant based on keywords.
     Returns both DID and JSON-LD with similarity measure.
     """
     try:
-        results = qdrant_service.search_documents(q)
+        # If collection is not provided, we could search across all? 
+        # For now, default to 'policy' if accessed through OAC router, or 'dids' in the service.
+        search_collection = collection or "policy"
+        results = qdrant_service.search_documents(q, collection=search_collection)
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")

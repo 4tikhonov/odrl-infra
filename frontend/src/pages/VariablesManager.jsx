@@ -162,7 +162,7 @@ export default function VariablesManager() {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                         <Variable className="text-blue-500" size={20} /> Recent Variables
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto pr-2 custom-scrollbar">
                         {history.length === 0 && (
                             <p className="text-gray-500 dark:text-gray-400 italic text-sm">No variables created yet.</p>
                         )}

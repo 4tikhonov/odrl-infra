@@ -266,7 +266,7 @@ export default function Demo() {
 
                     <div className="mt-auto pt-6 border-t border-gray-200 dark:border-white/10">
                         <h4 className="text-xs font-mono text-gray-500 dark:text-gray-400 uppercase mb-2">Execution Logs</h4>
-                        <div className="bg-gray-50 rounded-lg p-3 h-32 overflow-y-auto font-mono text-xs text-green-700 space-y-1 dark:bg-black/40 dark:text-green-300">
+                        <div className="bg-gray-50 rounded-lg p-3 h-32 overflow-y-auto custom-scrollbar font-mono text-xs text-green-700 space-y-1 dark:bg-black/40 dark:text-green-300">
                             {logs.length === 0 ? <span className="text-gray-400 dark:text-gray-600 italic">Ready to start...</span> : logs.map((l, i) => <div key={i}>{l}</div>)}
                         </div>
                     </div>

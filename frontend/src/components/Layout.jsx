@@ -4,67 +4,120 @@ import { LayoutDashboard, Wallet, ScrollText, PlayCircle, Sun, Moon, LogOut, Che
 import { cn } from '../lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 
-const NavItem = ({ to, icon: Icon, label }) => {
-    const location = useLocation();
-    const isActive = location.pathname === to;
-
+const NavItem = ({ to, icon: Icon, label, description, isActive }) => {
     return (
         <Link
             to={to}
             className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                "group relative flex items-start gap-3 px-5 py-3 rounded-2xl transition-all duration-400",
                 isActive
-                    ? "bg-indigo-50 text-indigo-700 shadow-sm ring-1 ring-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-300 dark:ring-indigo-500/40"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200"
+                    ? "bg-indigo-600/20 text-indigo-600 dark:bg-indigo-500/30 dark:text-indigo-400 shadow-[0_4px_25px_rgba(79,70,229,0.2)] ring-1 ring-white/20"
+                    : "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
             )}
         >
-            <Icon size={20} />
-            <span className="font-medium">{label}</span>
+            {isActive && (
+                <div className="absolute left-0 w-1.5 h-8 bg-indigo-600 dark:bg-indigo-500 rounded-r-full shadow-[0_0_15px_0_rgba(79,70,229,0.8)] top-1/2 -translate-y-1/2" />
+            )}
+
+            <div className={cn(
+                "p-2 rounded-xl transition-all duration-400 group-hover:rotate-6 group-hover:scale-110 shrink-0",
+                isActive
+                    ? "bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg dark:shadow-indigo-400/50"
+                    : "bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-gray-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/20 group-hover:text-indigo-600 dark:group-hover:text-indigo-300"
+            )}>
+                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+            </div>
+
+            <div className="flex flex-col gap-0.5 min-w-0">
+                <span className={cn(
+                    "font-bold text-[15px] tracking-tight transition-all duration-400",
+                    isActive ? "translate-x-1" : "group-hover:translate-x-1"
+                )}>
+                    {label}
+                </span>
+                <span className={cn(
+                    "text-[11px] font-semibold leading-tight transition-all duration-400 truncate",
+                    isActive
+                        ? "text-indigo-600/80 dark:text-indigo-400/80 translate-x-1"
+                        : "text-gray-500 dark:text-gray-400 group-hover:translate-x-1"
+                )}>
+                    {description}
+                </span>
+            </div>
+
+            {!isActive && (
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-500 opacity-0 transition-all duration-400 group-hover:opacity-100 group-hover:scale-125 shadow-[0_0_10px_rgba(99,102,241,0.8)] self-center" />
+            )}
         </Link>
     );
 };
 
 export default function Layout({ children }) {
+    const location = useLocation();
+
     return (
-        <div className="flex h-screen bg-gray-50 text-gray-900 dark:bg-[#1a1a1a] dark:text-white overflow-hidden transition-colors duration-300">
+        <div className="flex h-screen bg-white text-gray-900 dark:bg-[#050505] dark:text-white overflow-hidden selection:bg-indigo-500/30">
             {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-gray-200 dark:bg-[#242424] dark:border-white/10 flex flex-col transition-colors duration-300">
-                <div className="p-6 border-b border-gray-200 dark:border-white/10 flex justify-between items-center">
-                    <div>
-                        <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-cyan-600 dark:from-indigo-400 dark:to-cyan-400 bg-clip-text text-transparent">
-                            ODRL Infra
-                        </h1>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">DID-based Access Control</p>
+            <aside className="w-72 glass border-r border-gray-200 dark:border-white/5 flex flex-col relative z-20">
+                <div className="p-6 mb-2">
+                    <div className="flex items-center gap-3 mb-2 group cursor-default">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 flex items-center justify-center shadow-lg shadow-indigo-600/20 group-hover:scale-110 transition-transform duration-500">
+                            <ShieldCheck className="text-white" size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-black tracking-tight bg-gradient-to-r from-gray-900 via-indigo-800 to-gray-900 dark:from-white dark:via-indigo-300 dark:to-white bg-[length:200%_auto] animate-gradient-x bg-clip-text text-transparent">
+                                ODRL Infra
+                            </h1>
+                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-indigo-600/60 dark:text-indigo-400/60 uppercase tracking-widest leading-none">
+                                <span className="flex h-1 w-1 rounded-full bg-indigo-500 animate-pulse" />
+                                Protocol Layer
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <nav className="flex-1 p-4 space-y-2">
-                    <NavItem to="/" icon={LayoutDashboard} label="Dashboard" />
-                    <NavItem to="/dids" icon={FileKey} label="DID Manager" />
-                    <NavItem to="/vcs" icon={Wallet} label="VC Wallet" />
-                    <NavItem to="/policies" icon={ShieldCheck} label="Policy Builder" />
-                    <NavItem to="/prompts" icon={MessageSquare} label="Prompts Manager" />
-                    <NavItem to="/variables" icon={Database} label="Variables" />
-                    <div className="h-px bg-gray-200 dark:bg-white/10 my-2" />
-                    <NavItem to="/demo" icon={Play} label="Live Demo" />
-                </nav>
+                <div className="flex-1 px-4 overflow-y-auto no-scrollbar space-y-1">
+                    <NavItem to="/demo" icon={Play} label="Live Demo" description="Test all applications" isActive={location.pathname === "/demo"} />
+                    <NavItem to="/" icon={LayoutDashboard} label="Dashboard" description="Explore infrastructure" isActive={location.pathname === "/"} />
+                    <NavItem to="/dids" icon={FileKey} label="DID Manager" description="Bookmarks and resolver" isActive={location.pathname === "/dids"} />
+                    <NavItem to="/vcs" icon={Wallet} label="VC Wallet" description="Google, Github, ORCID and SSH" isActive={location.pathname === "/vcs"} />
+                    <NavItem to="/policies" icon={ShieldCheck} label="Policy Builder" description="Create your policy" isActive={location.pathname === "/policies"} />
+                    <NavItem to="/prompts" icon={MessageSquare} label="Prompts Manager" description="FAIR LLM prompts" isActive={location.pathname === "/prompts"} />
+                    <NavItem to="/variables" icon={Database} label="Variables" description="Cross-Domain Interoperability" isActive={location.pathname === "/variables"} />
+                </div>
 
-                <div className="p-4 border-t border-gray-200 dark:border-white/10 space-y-4">
-                    <div className="flex items-center justify-between px-2">
-                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Theme</span>
-                        <ThemeToggle />
-                    </div>
-                    <div className="flex items-center gap-3 px-4 py-2 text-sm text-gray-500 dark:text-gray-500">
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span>System Online</span>
+                <div className="p-4 mt-auto">
+                    <div className="glass-card p-4 rounded-2xl space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 opacity-60 uppercase tracking-[0.2em] mb-0.5">Appearance</p>
+                                <p className="text-[11px] font-bold text-gray-800 dark:text-gray-100 capitalize">{location.pathname.replace('/', '') || 'Dashboard'}</p>
+                            </div>
+                            <ThemeToggle />
+                        </div>
+                        <div className="pt-3 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                                <div className="relative flex items-center justify-center">
+                                    <div className="absolute w-2.5 h-2.5 rounded-full bg-green-500/40 animate-ping" />
+                                    <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                                </div>
+                                <span className="text-[11px] font-extrabold text-gray-600 dark:text-gray-300 tracking-tight uppercase">API Stable</span>
+                            </div>
+                            <button className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-gray-400 hover:text-red-500 transition-all duration-300 group/logout">
+                                <LogOut size={16} className="group-hover/logout:-translate-x-0.5" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-auto bg-gray-50 dark:bg-[#121212] relative transition-colors duration-300">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-transparent dark:from-indigo-900/10 pointer-events-none" />
-                <div className="p-8 max-w-7xl mx-auto relative z-10">
+            <main className="flex-1 overflow-auto bg-[#fdfdfd] dark:bg-[#0a0a0a] relative">
+                {/* Background Decorations */}
+                <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-indigo-500/5 blur-[120px] pointer-events-none rounded-full -translate-y-1/2 translate-x-1/4" />
+                <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-purple-500/5 blur-[100px] pointer-events-none rounded-full translate-y-1/2 -translate-x-1/4" />
+
+                <div className="p-10 max-w-7xl mx-auto relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     {children}
                 </div>
             </main>
