@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Play, CheckCircle, Circle, ArrowRight, FileJson, Loader2, ExternalLink, ShieldCheck, MessageSquare, Database } from 'lucide-react';
+import { Play, CheckCircle, Circle, ArrowRight, FileJson, Loader2, ExternalLink, ShieldCheck, MessageSquare, Database, Sparkles } from 'lucide-react';
 import api from '../services/api';
 import { cn } from '../lib/utils';
 import { Link } from 'react-router-dom';
@@ -214,7 +214,14 @@ export default function Demo() {
             };
 
             const anchorRes = await api.post('/did/create', { payload });
-            setResults(prev => ({ ...prev, created: { ...anchorRes.data, originalContent: payload } }));
+            setResults(prev => ({
+                ...prev,
+                created: {
+                    ...anchorRes.data,
+                    originalContent: payload,
+                    originalUrl: croissantUrl
+                }
+            }));
             addLog(`Croissant DID anchored: ${anchorRes.data.did}`);
             setActiveStep(2);
 
@@ -374,6 +381,43 @@ export default function Demo() {
                                     </div>
                                 )}
                             </>
+                        )}
+
+                        {/* CROISSANT SCENARIO RESULTS */}
+                        {activeScenario === 'croissant' && results.created && (
+                            <div className="bg-white p-6 rounded-lg border border-orange-200 animate-in fade-in slide-in-from-bottom-4 dark:bg-[#242424] dark:border-orange-500/30">
+                                <h5 className="text-sm text-orange-600 font-bold uppercase mb-4 flex items-center gap-2">
+                                    <Sparkles className="text-orange-500" size={16} /> Anchored Croissant Dataset
+                                </h5>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="text-xs text-gray-500 uppercase font-semibold">Source Dataset (Dataverse)</label>
+                                        <div className="mt-1">
+                                            <a
+                                                href={results.created.originalUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 text-sm font-medium break-all"
+                                            >
+                                                {results.created.originalUrl}
+                                                <ExternalLink size={12} />
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-gray-500 uppercase font-semibold">Linked DID</label>
+                                        <div className="font-mono text-sm mt-1">
+                                            <ResolverLink did={results.created.did} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-gray-500 uppercase font-semibold">Croissant Metadata</label>
+                                        <pre className="mt-1 bg-gray-50 dark:bg-black/30 p-3 rounded font-mono text-xs text-gray-700 dark:text-gray-300 max-h-60 overflow-y-auto custom-scrollbar">
+                                            {JSON.stringify(results.created.originalContent, null, 2)}
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
                         )}
 
                         {/* PROMPT/VARIABLE SCENARIO RESULTS */}
