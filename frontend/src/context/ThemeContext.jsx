@@ -7,8 +7,6 @@ const ThemeContext = createContext({
 
 export function ThemeProvider({ children }) {
     const [theme, setTheme] = useState(() => {
-        // Default to 'light' if not set, or use system preference if you wanted
-        // but requirement is 'White is default'
         return localStorage.getItem("theme") || "light";
     });
 

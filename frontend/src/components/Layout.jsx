@@ -88,39 +88,40 @@ export default function Layout({ children }) {
                     <NavItem to="/croissants" icon={FileJson} label="Croissants" description="AI-Ready data" isActive={location.pathname === "/croissants"} />
                 </div>
 
-                <div className="p-4 mt-auto">
-                    <div className="glass-card p-4 rounded-2xl space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 opacity-60 uppercase tracking-[0.2em] mb-0.5">Appearance</p>
-                                <p className="text-[11px] font-bold text-gray-800 dark:text-gray-100 capitalize">{location.pathname.replace('/', '') || 'Dashboard'}</p>
-                            </div>
-                            <ThemeToggle />
+                <div className="p-6 mt-auto border-t border-gray-100 dark:border-white/5">
+                    <div className="flex items-center gap-3">
+                        <div className="relative flex items-center justify-center">
+                            <div className="absolute w-2.5 h-2.5 rounded-full bg-green-500/40 animate-ping" />
+                            <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
                         </div>
-                        <div className="pt-3 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                                <div className="relative flex items-center justify-center">
-                                    <div className="absolute w-2.5 h-2.5 rounded-full bg-green-500/40 animate-ping" />
-                                    <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
-                                </div>
-                                <span className="text-[11px] font-extrabold text-gray-600 dark:text-gray-300 tracking-tight uppercase">API Stable</span>
-                            </div>
-                            <button className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-gray-400 hover:text-red-500 transition-all duration-300 group/logout">
-                                <LogOut size={16} className="group-hover/logout:-translate-x-0.5" />
-                            </button>
-                        </div>
+                        <span className="text-[11px] font-extrabold text-gray-500 dark:text-gray-400 tracking-tight uppercase">System Online</span>
                     </div>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-x-hidden overflow-y-auto custom-scrollbar bg-[#fdfdfd] dark:bg-[#0a0a0a] relative h-full">
-                {/* Background Decorations */}
-                <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-indigo-500/5 blur-[120px] pointer-events-none rounded-full -translate-y-1/2 translate-x-1/4" />
-                <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-purple-500/5 blur-[100px] pointer-events-none rounded-full translate-y-1/2 -translate-x-1/4" />
+            <main className="flex-1 overflow-x-hidden overflow-y-auto custom-scrollbar bg-[#fdfdfd] dark:bg-[#0a0a0a] relative h-full flex flex-col">
+                {/* Top Bar */}
+                <header className="sticky top-0 z-30 flex items-center justify-end gap-4 p-4 md:px-8 glass border-b border-gray-200 dark:border-white/5 animate-in slide-in-from-top-4 duration-500">
+                    <Link
+                        to="/vcs"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-all shadow-lg shadow-indigo-600/20 active:scale-95 group"
+                    >
+                        <Wallet size={16} className="group-hover:rotate-12 transition-transform" />
+                        Login
+                    </Link>
+                    <div className="w-px h-6 bg-gray-200 dark:bg-white/10 mx-1" />
+                    <ThemeToggle />
+                </header>
 
-                <div className="p-4 md:p-8 lg:p-10 max-w-7xl mx-auto relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    {children}
+                <div className="relative flex-1">
+                    {/* Background Decorations */}
+                    <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-indigo-500/5 blur-[120px] pointer-events-none rounded-full -translate-y-1/2 translate-x-1/4" />
+                    <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-purple-500/5 blur-[100px] pointer-events-none rounded-full translate-y-1/2 -translate-x-1/4" />
+
+                    <div className="p-4 md:p-8 lg:p-10 max-w-7xl mx-auto relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        {children}
+                    </div>
                 </div>
             </main>
         </div>

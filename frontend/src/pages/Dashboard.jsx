@@ -51,7 +51,7 @@ export default function Dashboard() {
                     ODRL <span className="text-indigo-600 dark:text-indigo-400">Protocol Layer</span>
                 </h2>
                 <p className="text-gray-500 dark:text-gray-400 mt-4 max-w-2xl text-lg leading-relaxed">
-                    Manage your decentralized identifiers, verify organizational metadata, and deploy sophisticated access control policies with semantic indexing.
+                    Manage your decentralized identifiers, verify organizational metadata, and deploy sophisticated access control policies with Open Digital Rights Language and semantic indexing.
                 </p>
             </header>
 
