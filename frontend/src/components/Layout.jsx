@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Wallet, ScrollText, PlayCircle, Sun, Moon, LogOut, CheckCircle, Menu, X, FileText, Database, ShieldCheck, FileKey, Play, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Wallet, ScrollText, PlayCircle, Sun, Moon, LogOut, CheckCircle, Menu, X, FileText, Database, ShieldCheck, FileKey, Play, MessageSquare, FileJson } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -79,6 +79,7 @@ export default function Layout({ children }) {
                 <div className="flex-1 px-4 overflow-y-auto no-scrollbar space-y-1">
                     <NavItem to="/demo" icon={Play} label="Live Demo" description="Test all applications" isActive={location.pathname === "/demo"} />
                     <NavItem to="/" icon={LayoutDashboard} label="Dashboard" description="Explore infrastructure" isActive={location.pathname === "/"} />
+                    <NavItem to="/croissants" icon={FileJson} label="Croissants" description="AI-Ready data" isActive={location.pathname === "/croissants"} />
                     <NavItem to="/dids" icon={FileKey} label="DID Manager" description="Bookmarks and resolver" isActive={location.pathname === "/dids"} />
                     <NavItem to="/vcs" icon={Wallet} label="VC Wallet" description="Google, Github, ORCID and SSH" isActive={location.pathname === "/vcs"} />
                     <NavItem to="/policies" icon={ShieldCheck} label="Policy Builder" description="Create your policy" isActive={location.pathname === "/policies"} />

@@ -173,6 +173,20 @@ async def create_did_from_url(url: str, token: str = Query(None, description="Op
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
 
+@router.get("/fetch_jsonld")
+async def fetch_jsonld(url: str):
+    """
+    Fetch JSON-LD from a URL (Backend proxy to avoid CORS).
+    """
+    try:
+        response = requests.get(url, timeout=15)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        raise HTTPException(status_code=400, detail=f"Failed to fetch URL: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error parsing JSON: {str(e)}")
+
 @router.get("/share/{did}")
 async def share_did(did: str, language: str = Query(None), token: str = Query(None)):
     """
@@ -298,6 +312,11 @@ async def read_did(did: str):
         return json.loads(result.stdout)
     except json.JSONDecodeError:
         return {"raw_output": result.stdout}
+
+@router.get("/resolve/{did}")
+async def resolve_did_alias(did: str):
+    """Alias for read_did to support older frontend builds or standard resolution paths."""
+    return await read_did(did)
 
 @router.post("/update")
 async def update_did(request: DidUpdateRequest):

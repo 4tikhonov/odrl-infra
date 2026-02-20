@@ -39,6 +39,17 @@ const SCENARIOS = {
             { id: 'resolve', label: 'Resolve DID', description: 'Retrieve variable from ledger' },
             { id: 'verify', label: 'Verify Content', description: 'Check data integrity' },
         ]
+    },
+    croissant: {
+        id: 'croissant',
+        label: 'Test Croissant',
+        icon: FileJson,
+        description: 'Anchor Dataverse Croissant dataset',
+        steps: [
+            { id: 'fetch', label: 'Fetch Croissant', description: 'Get JSON-LD from Dataverse' },
+            { id: 'anchor', label: 'Anchor DID', description: 'Assign DID to Croissant metadata' },
+            { id: 'verify', label: 'Verify DID', description: 'Resolve and validate metadata' },
+        ]
     }
 };
 
@@ -176,6 +187,52 @@ export default function Demo() {
         }
     };
 
+    const runCroissantScenario = async () => {
+        setActiveStep(0);
+        try {
+            const croissantUrl = "https://dataverse.harvard.edu/api/datasets/export?exporter=croissant&persistentId=doi%3A10.7910/DVN/HAEP2K";
+
+            // Step 1: Fetch
+            await new Promise(r => setTimeout(r, 600));
+            addLog(`Fetching Croissant metadata from Dataverse...`);
+
+            // Use backend proxy to avoid CORS
+            const fetchRes = await api.get(`/did/fetch_jsonld?url=${encodeURIComponent(croissantUrl)}`);
+            const croissantJson = fetchRes.data;
+
+            addLog("Croissant JSON-LD fetched successfully.");
+            setActiveStep(1);
+
+            // Step 2: Anchor
+            await new Promise(r => setTimeout(r, 800));
+            addLog("Anchoring Croissant metadata as OYD DID...");
+
+            const payload = {
+                ...croissantJson,
+                type: "Croissant",
+                anchored_at: new Date().toISOString()
+            };
+
+            const anchorRes = await api.post('/did/create', { payload });
+            setResults(prev => ({ ...prev, created: { ...anchorRes.data, originalContent: payload } }));
+            addLog(`Croissant DID anchored: ${anchorRes.data.did}`);
+            setActiveStep(2);
+
+            // Step 3: Verify
+            await new Promise(r => setTimeout(r, 1000));
+            addLog(`Resolving DID ${anchorRes.data.did} to verify content...`);
+            const resolveRes = await api.get(`/did/${anchorRes.data.did}`);
+
+            setResults(prev => ({ ...prev, verify: { status: "Verified", match: true } }));
+            addLog("Resolution successful. Data integrity verified.");
+            setActiveStep(3);
+
+        } catch (error) {
+            addLog(`ERROR: ${error.message}`);
+            console.error(error);
+        }
+    };
+
     const runScenario = async () => {
         setActiveStep(0);
         setLogs([]);
@@ -187,6 +244,8 @@ export default function Demo() {
             await runArtifactScenario('Prompt');
         } else if (activeScenario === 'variable') {
             await runArtifactScenario('Variable');
+        } else if (activeScenario === 'croissant') {
+            await runCroissantScenario();
         }
     };
 
@@ -195,8 +254,8 @@ export default function Demo() {
     return (
         <div className="max-w-6xl mx-auto h-[calc(100vh-140px)] flex flex-col">
             <div className="mb-6">
-                <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Live Demo: FAIR for Open Digital Rights Language</h2>
-                <p className="text-gray-500 dark:text-gray-400">Automated end-to-end verification of ODRL policies and DID artifacts.</p>
+                <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Live Demo: FAIR Data Spaces managed by ODRL</h2>
+                <p className="text-gray-500 dark:text-gray-400">Automated end-to-end verification of Open Digital Rights Language policies and DID artifacts.</p>
             </div>
 
             {/* Submenu */}

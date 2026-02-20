@@ -9,6 +9,7 @@ import PolicyBuilder from './pages/PolicyBuilder';
 import Demo from './pages/Demo';
 import PromptsManager from './pages/PromptsManager';
 import VariablesManager from './pages/VariablesManager';
+import CroissantsManager from './pages/CroissantsManager';
 
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -27,6 +28,7 @@ function App() {
               <Route path="/policies" element={<PolicyBuilder />} />
               <Route path="/prompts" element={<PromptsManager />} />
               <Route path="/variables" element={<VariablesManager />} />
+              <Route path="/croissants" element={<CroissantsManager />} />
               <Route path="/demo" element={<Demo />} />
             </Routes>
           </Layout>
