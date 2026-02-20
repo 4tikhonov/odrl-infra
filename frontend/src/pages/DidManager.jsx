@@ -160,7 +160,7 @@ export default function DidManager() {
                                 <h3 className="text-lg font-semibold text-green-600 dark:text-green-400 mb-4 flex items-center gap-2">
                                     <CheckCircle size={18} /> Resolved Document
                                 </h3>
-                                <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto font-mono text-sm text-gray-900 dark:bg-black/30 dark:text-gray-300 border border-gray-100 dark:border-transparent">
+                                <pre className="bg-gray-50 p-4 rounded-lg overflow-auto max-h-96 font-mono text-sm text-gray-900 dark:bg-black/30 dark:text-gray-300 border border-gray-100 dark:border-transparent custom-scrollbar">
                                     {JSON.stringify(resolveMutation.data, null, 2)}
                                 </pre>
                             </div>

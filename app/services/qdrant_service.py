@@ -9,7 +9,7 @@ class QdrantService:
     def __init__(self):
         self.qdrant_host = os.getenv("QDRANT_HOST", "localhost")
         self.qdrant_port = int(os.getenv("QDRANT_PORT", 6333))
-        self.collections = ["policy", "prompts", "variables", "croissant", "dids"]
+        self.collections = ["policy", "prompts", "variables", "croissant", "dids", "groups"]
         self.client = QdrantClient(host=self.qdrant_host, port=self.qdrant_port)
         self.encoder = TextEmbedding()
         self._ensure_collections()
@@ -123,6 +123,11 @@ class QdrantService:
         # 4. Croissant
         if "recordSet" in payload or "@dataset" in payload or payload.get("dataset") == "Croissant":
             return "croissant"
+            
+        # 5. Organizations / Groups (Organization Ontology)
+        org_types = ["Organization", "Membership", "Role", "FormalOrganization", "OrganizationalUnit", "OrganizationalCollaboration"]
+        if payload.get("type") in org_types or "org:" in str(payload.get("@context", "")).lower():
+            return "groups"
             
         # Default
         return "dids"

@@ -258,7 +258,7 @@ export default function VcWallet() {
                                     <h3 className="text-green-600 dark:text-green-400 font-semibold mb-2 flex items-center gap-2">
                                         <CheckCircle size={18} /> Credentials Issued!
                                     </h3>
-                                    <pre className="bg-white border border-gray-200 p-3 rounded overflow-x-auto text-xs font-mono text-gray-900 dark:bg-black/30 dark:text-gray-300 dark:border-transparent">
+                                    <pre className="bg-white border border-gray-200 p-3 rounded overflow-auto max-h-96 text-xs font-mono text-gray-900 dark:bg-black/30 dark:text-gray-300 dark:border-transparent custom-scrollbar">
                                         {JSON.stringify(result, null, 2)}
                                     </pre>
                                 </div>

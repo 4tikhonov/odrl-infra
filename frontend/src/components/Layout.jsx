@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Wallet, ScrollText, PlayCircle, Sun, Moon, LogOut, CheckCircle, Menu, X, FileText, Database, ShieldCheck, FileKey, Play, MessageSquare, FileJson } from 'lucide-react';
+import { LayoutDashboard, Wallet, ScrollText, PlayCircle, Sun, Moon, LogOut, CheckCircle, Menu, X, FileText, Database, ShieldCheck, FileKey, Play, MessageSquare, FileJson, Users } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -79,12 +79,13 @@ export default function Layout({ children }) {
                 <div className="flex-1 px-4 overflow-y-auto no-scrollbar space-y-1">
                     <NavItem to="/demo" icon={Play} label="Live Demo" description="Test all applications" isActive={location.pathname === "/demo"} />
                     <NavItem to="/" icon={LayoutDashboard} label="Dashboard" description="Explore infrastructure" isActive={location.pathname === "/"} />
-                    <NavItem to="/croissants" icon={FileJson} label="Croissants" description="AI-Ready data" isActive={location.pathname === "/croissants"} />
                     <NavItem to="/dids" icon={FileKey} label="DID Manager" description="Bookmarks and resolver" isActive={location.pathname === "/dids"} />
                     <NavItem to="/vcs" icon={Wallet} label="VC Wallet" description="Google, Github, ORCID and SSH" isActive={location.pathname === "/vcs"} />
                     <NavItem to="/policies" icon={ShieldCheck} label="Policy Builder" description="Create your policy" isActive={location.pathname === "/policies"} />
                     <NavItem to="/prompts" icon={MessageSquare} label="Prompts Manager" description="FAIR LLM prompts" isActive={location.pathname === "/prompts"} />
                     <NavItem to="/variables" icon={Database} label="Variables" description="Cross-Domain Interoperability" isActive={location.pathname === "/variables"} />
+                    <NavItem to="/groups" icon={Users} label="Groups" description="Organization Ontology" isActive={location.pathname === "/groups"} />
+                    <NavItem to="/croissants" icon={FileJson} label="Croissants" description="AI-Ready data" isActive={location.pathname === "/croissants"} />
                 </div>
 
                 <div className="p-4 mt-auto">
@@ -113,12 +114,12 @@ export default function Layout({ children }) {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-auto bg-[#fdfdfd] dark:bg-[#0a0a0a] relative">
+            <main className="flex-1 overflow-x-hidden overflow-y-auto custom-scrollbar bg-[#fdfdfd] dark:bg-[#0a0a0a] relative h-full">
                 {/* Background Decorations */}
                 <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-indigo-500/5 blur-[120px] pointer-events-none rounded-full -translate-y-1/2 translate-x-1/4" />
                 <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-purple-500/5 blur-[100px] pointer-events-none rounded-full translate-y-1/2 -translate-x-1/4" />
 
-                <div className="p-10 max-w-7xl mx-auto relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div className="p-4 md:p-8 lg:p-10 max-w-7xl mx-auto relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     {children}
                 </div>
             </main>

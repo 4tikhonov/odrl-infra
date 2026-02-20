@@ -10,6 +10,7 @@ import Demo from './pages/Demo';
 import PromptsManager from './pages/PromptsManager';
 import VariablesManager from './pages/VariablesManager';
 import CroissantsManager from './pages/CroissantsManager';
+import GroupsManager from './pages/GroupsManager';
 
 import { ThemeProvider } from './context/ThemeContext';
 
@@ -29,6 +30,7 @@ function App() {
               <Route path="/prompts" element={<PromptsManager />} />
               <Route path="/variables" element={<VariablesManager />} />
               <Route path="/croissants" element={<CroissantsManager />} />
+              <Route path="/groups" element={<GroupsManager />} />
               <Route path="/demo" element={<Demo />} />
             </Routes>
           </Layout>

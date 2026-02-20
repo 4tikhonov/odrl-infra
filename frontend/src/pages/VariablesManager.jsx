@@ -146,13 +146,17 @@ export default function VariablesManager() {
                     {createMutation.data && (
                         <div className="p-6 bg-green-50 border border-green-200 rounded-xl dark:bg-green-500/10 dark:border-green-500/20">
                             <h3 className="text-green-600 dark:text-green-400 font-semibold mb-2 flex items-center gap-2">
-                                <CheckCircle size={20} /> <a href={`https://oydid.ownyourdata.eu/${createMutation.data.did}`} target="_blank" rel="noopener noreferrer" className="hover:underline">Variable Anchored Successfully</a>
+                                <CheckCircle size={20} /> Variable Anchored Successfully
                             </h3>
                             <div className="font-mono text-sm break-all text-gray-900 bg-white border border-gray-200 p-3 rounded select-all dark:text-gray-300 dark:bg-black/20 dark:border-transparent">
-                                <a href={`https://oydid.ownyourdata.eu/${createMutation.data.did}`} target="_blank" rel="noopener noreferrer" className="hover:underline text-blue-600 dark:text-blue-400">
+                                <Link
+                                    to={`/dids?resolve=${createMutation.data.did}`}
+                                    className="hover:underline text-blue-600 dark:text-blue-400"
+                                >
                                     {createMutation.data.did}
-                                </a>
+                                </Link>
                             </div>
+                            <p className="text-[10px] text-gray-500 mt-2 italic">Note: Locally anchored DIDs are resolvable via the internal DID Manager.</p>
                         </div>
                     )}
                 </div>

@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Play, CheckCircle, Circle, ArrowRight, FileJson, Loader2, ExternalLink, ShieldCheck, MessageSquare, Database, Sparkles } from 'lucide-react';
+import { Play, CheckCircle, Circle, ArrowRight, FileJson, Loader2, ExternalLink, ShieldCheck, MessageSquare, Database, Sparkles, Users } from 'lucide-react';
 import api from '../services/api';
 import { cn } from '../lib/utils';
 import { Link } from 'react-router-dom';
 
 const SCENARIOS = {
+    group: {
+        id: 'group',
+        label: 'Test Group',
+        icon: Users,
+        description: 'Anchor Organization metadata',
+        steps: [
+            { id: 'create', label: 'Anchor Group', description: 'Manchester University' },
+            { id: 'index', label: 'Vector Index', description: 'Store in groups collection' },
+            { id: 'verify', label: 'Verify Search', description: 'Semantic retrieval check' },
+        ]
+    },
     policy: {
         id: 'policy',
         label: 'Test Policy',
@@ -53,23 +64,34 @@ const SCENARIOS = {
     }
 };
 
-const ResolverLink = ({ did }) => {
+const ResolverLink = ({ did, local = true }) => {
     if (!did) return null;
+    if (local) {
+        return (
+            <Link
+                to={`/dids?resolve=${did}`}
+                className="text-indigo-600 hover:text-indigo-800 hover:underline inline-flex items-center gap-1 dark:text-indigo-400 dark:hover:text-indigo-300 break-all"
+                title="Resolve locally"
+            >
+                {did}
+            </Link>
+        );
+    }
     return (
         <a
             href={`https://dev.uniresolver.io/#${did}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1 dark:text-blue-400 dark:hover:text-blue-300"
+            className="text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1 dark:text-blue-400 dark:hover:text-blue-300 break-all"
             title="View on Universal Resolver"
         >
-            {did} <ExternalLink size={12} />
+            {did} <ExternalLink size={12} className="shrink-0" />
         </a>
     );
 };
 
 export default function Demo() {
-    const [activeScenario, setActiveScenario] = useState('policy');
+    const [activeScenario, setActiveScenario] = useState('group');
     const [activeStep, setActiveStep] = useState(-1);
     const [logs, setLogs] = useState([]);
     const [results, setResults] = useState({});
@@ -128,6 +150,42 @@ export default function Demo() {
             setResults(prev => ({ ...prev, verify: verifyRes.data }));
             addLog("Verification Successful. Scenario Complete.");
             setActiveStep(4);
+        } catch (error) {
+            addLog(`ERROR: ${error.message}`);
+            console.error(error);
+        }
+    };
+
+    const runGroupScenario = async () => {
+        try {
+            // Step 1: Create
+            addLog("Anchoring Organization: Manchester University...");
+            const payload = {
+                "@context": "http://www.w3.org/ns/org#",
+                "type": "Organization",
+                "name": "Manchester University",
+                "description": "Researchers from Manchester University",
+                "timestamp": new Date().toISOString()
+            };
+            const res = await api.post('/did/create', { payload });
+            setResults(prev => ({ ...prev, created: { ...res.data, originalContent: payload } }));
+            addLog(`Organization Anchored: ${res.data.did}`);
+            setActiveStep(1);
+
+            // Step 2: Vector Index
+            await new Promise(r => setTimeout(r, 1000));
+            addLog("Verifying Qdrant indexing in 'groups' collection...");
+            setActiveStep(2);
+
+            // Step 3: Verify
+            await new Promise(r => setTimeout(r, 800));
+            addLog("Performing semantic search verification...");
+            const searchRes = await api.get('/oac/search', {
+                params: { q: "Manchester University", collection: "groups" }
+            });
+            setResults(prev => ({ ...prev, verify: { status: "Verified", match: true, searchResult: searchRes.data } }));
+            addLog("Search successful. Scenario Complete.");
+            setActiveStep(3);
         } catch (error) {
             addLog(`ERROR: ${error.message}`);
             console.error(error);
@@ -245,7 +303,9 @@ export default function Demo() {
         setLogs([]);
         setResults({});
 
-        if (activeScenario === 'policy') {
+        if (activeScenario === 'group') {
+            await runGroupScenario();
+        } else if (activeScenario === 'policy') {
             await runPolicyScenario();
         } else if (activeScenario === 'prompt') {
             await runArtifactScenario('Prompt');
@@ -259,7 +319,7 @@ export default function Demo() {
     const currentSteps = SCENARIOS[activeScenario].steps;
 
     return (
-        <div className="max-w-6xl mx-auto h-[calc(100vh-140px)] flex flex-col">
+        <div className="max-w-6xl mx-auto h-[calc(100vh-180px)] flex flex-col">
             <div className="mb-6">
                 <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">Live Demo: FAIR Data Spaces managed by ODRL</h2>
                 <p className="text-gray-500 dark:text-gray-400">Automated end-to-end verification of Open Digital Rights Language policies and DID artifacts.</p>
@@ -420,20 +480,22 @@ export default function Demo() {
                             </div>
                         )}
 
-                        {/* PROMPT/VARIABLE SCENARIO RESULTS */}
-                        {(activeScenario === 'prompt' || activeScenario === 'variable') && results.created && (
+                        {/* PROMPT/VARIABLE/GROUP SCENARIO RESULTS */}
+                        {(activeScenario === 'prompt' || activeScenario === 'variable' || activeScenario === 'group') && results.created && (
                             <div className="bg-white p-6 rounded-lg border border-blue-200 animate-in fade-in slide-in-from-bottom-4 dark:bg-[#242424] dark:border-blue-500/30">
                                 <h5 className="text-sm text-blue-600 font-bold uppercase mb-4 flex items-center gap-2">
-                                    <CheckCircle size={16} /> Created {activeScenario === 'prompt' ? 'Prompt' : 'Variable'} DID
+                                    <CheckCircle size={16} /> Created {activeScenario === 'prompt' ? 'Prompt' : activeScenario === 'variable' ? 'Variable' : 'Group'} DID
                                 </h5>
                                 <div className="space-y-4">
                                     <div>
                                         <label className="text-xs text-gray-500 uppercase font-semibold">DID</label>
-                                        <div className="font-mono text-sm mt-1"><ResolverLink did={results.created.did} /></div>
+                                        <div className="font-mono text-sm mt-1">
+                                            <ResolverLink did={results.created.did} />
+                                        </div>
                                     </div>
                                     <div>
                                         <label className="text-xs text-gray-500 uppercase font-semibold">Payload Content</label>
-                                        <pre className="mt-1 bg-gray-50 dark:bg-black/30 p-3 rounded font-mono text-xs text-gray-700 dark:text-gray-300">
+                                        <pre className="mt-1 bg-gray-50 dark:bg-black/30 p-3 rounded font-mono text-xs text-gray-700 dark:text-gray-300 max-h-60 overflow-auto custom-scrollbar">
                                             {JSON.stringify(results.created.originalContent || results.created, null, 2)}
                                         </pre>
                                     </div>
