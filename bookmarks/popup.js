@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bookmarkBtn.addEventListener('click', async () => {
         let apiUrl = apiUrlInput.value.trim();
         if (!apiUrl) {
-            apiUrl = 'https://odrl.dev.codata.org/did/create';
+            apiUrl = 'https://odrl.dev.codata.org/api/did/create';
             apiUrlInput.value = apiUrl;
         }
 
