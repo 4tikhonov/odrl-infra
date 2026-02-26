@@ -11,7 +11,7 @@ FROM ruby:3.2-slim
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-    libsodium-dev git make gcc libc-dev jq bash curl python3 python3-pip openssh-client && \
+    build-essential libsodium-dev libssl-dev zlib1g-dev pkg-config git jq bash curl python3 python3-pip openssh-client && \
     rm -rf /var/lib/apt/lists/* && \
     gem install httparty ed25519 multibases multihashes multicodecs optparse rbnacl dag uri oydid && \
     gem install json-canonicalization -v 0.2.1 && \
