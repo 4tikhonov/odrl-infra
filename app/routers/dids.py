@@ -336,6 +336,47 @@ async def resolve_did(did: str):
     except json.JSONDecodeError:
         return {"raw_output": result.stdout}
 
+@router.get("/validate/{did}")
+async def validate_did(did: str, public_key: str = Query(None, description="Public key multibase to check against the DID")):
+    """
+    Validate a DID. If public_key is provided, verifies if the user with this public key created or controls the DID.
+    """
+    if "&" in did:
+        did = did.split("&")[0]
+
+    result = run_oydid_command(["read", did, "--w3c-did"])
+    
+    if result.returncode != 0:
+        error_detail = getattr(result, "error_msg", result.stderr)
+        raise HTTPException(status_code=404, detail=f"DID not found or invalid: {error_detail}")
+        
+    try:
+        did_doc = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Invalid JSON returned from resolver")
+        
+    response = {
+        "valid": True,
+        "did": did,
+        "message": "DID is valid and resolvable."
+    }
+    
+    if public_key:
+        keys = []
+        for vm in did_doc.get("verificationMethod", []):
+            pk = vm.get("publicKeyMultibase")
+            if pk:
+                keys.append(pk)
+        
+        if public_key in keys:
+             response["public_key_match"] = True
+             response["message"] = f"The provided public key is authorized for this DID."
+        else:
+             response["public_key_match"] = False
+             response["message"] = f"The provided public key was NOT found in the DID document."
+             
+    return response
+
 @router.post("/update")
 async def update_did(request: DidUpdateRequest):
     """Update a DID"""
