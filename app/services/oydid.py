@@ -7,10 +7,14 @@ def run_oydid_command(args, input_data=None):
     """Helper to run oydid commands"""
     # Check for OYDID_LOCATION environment variable
     location = os.getenv("OYDID_LOCATION")
+    # Use the local script if it exists to pick up changes from the volume mount
+    local_oydid = os.path.join(os.getcwd(), "oydid", "cli", "oydid.rb")
+    oydid_exec = local_oydid if os.path.exists(local_oydid) else "oydid"
+    
     if location and "--location" not in args and "-l" not in args:
-        cmd = ["oydid"] + ["--location", location] + args
+        cmd = [oydid_exec] + ["--location", location] + args
     else:
-        cmd = ["oydid"] + args
+        cmd = [oydid_exec] + args
     
     input_str = None
     if input_data:

@@ -342,7 +342,7 @@ async def create_restricted_did(request: DidCreateRestrictedRequest):
     """Create a new restricted DID encrypted for a specific target DID"""
     # 1. Encrypt the payload using the target DID
     payload_json = json.dumps(request.payload)
-    encrypt_result = run_oydid_command(["encrypt", "--from", request.target_did, "--json-output"], input_data=request.payload)
+    encrypt_result = run_oydid_command(["encrypt", request.target_did, "--json-output"], input_data=request.payload)
     
     if encrypt_result.returncode != 0:
         error_detail = getattr(encrypt_result, "error_msg", encrypt_result.stderr)
