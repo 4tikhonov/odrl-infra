@@ -4,6 +4,7 @@ from ..services.oydid import run_oydid_command
 from ..services.qdrant_service import qdrant_service
 import json
 import requests
+import os
 import re
 from datetime import datetime
 from rdflib import Graph, Literal, URIRef, Namespace
@@ -269,6 +270,45 @@ async def share_did(did: str, language: str = Query(None), token: str = Query(No
     except json.JSONDecodeError:
         return {"raw_output": result.stdout}
 
+def get_did_w3c_and_keys(did: str, did_data: dict) -> dict:
+    """Helper to fetch W3C document and read associated local keys"""
+    response_data = dict(did_data)
+    
+    # 1. Fetch W3C Document
+    w3c_result = run_oydid_command(["read", did, "--w3c-did"])
+    if w3c_result.returncode == 0:
+        try:
+            response_data["did_document"] = json.loads(w3c_result.stdout)
+        except:
+            pass
+            
+    # 2. Extract generated keys from local filesystem
+    did10 = did.replace("did:oyd:", "").split("&")[0][:10]
+    keys = {}
+    
+    priv_file = f"{did10}_private_key.enc"
+    if os.path.exists(priv_file):
+        with open(priv_file, "r") as f:
+            keys["private_key"] = f.read().strip()
+            
+    rev_key_file = f"{did10}_revocation_key.enc"
+    if os.path.exists(rev_key_file):
+        with open(rev_key_file, "r") as f:
+            keys["revocation_key"] = f.read().strip()
+            
+    rev_json_file = f"{did10}_revocation.json"
+    if os.path.exists(rev_json_file):
+        try:
+            with open(rev_json_file, "r") as f:
+                keys["revocation_json"] = json.loads(f.read())
+        except:
+            pass
+            
+    if keys:
+        response_data["keys"] = keys
+        
+    return response_data
+
 @router.post("/create")
 async def create_did(request: DidCreateRequest):
     """Create a new DID"""
@@ -292,7 +332,8 @@ async def create_did(request: DidCreateRequest):
         except Exception as e:
             print(f"Warning: Failed to store in Qdrant: {e}")
             
-        return did_data
+        return get_did_w3c_and_keys(did, did_data)
+        
     except json.JSONDecodeError:
         return {"raw_output": result.stdout}
 
@@ -338,7 +379,8 @@ async def create_restricted_did(request: DidCreateRestrictedRequest):
         except Exception as e:
             print(f"Warning: Failed to store in Qdrant: {e}")
             
-        return did_data
+        return get_did_w3c_and_keys(did, did_data)
+        
     except json.JSONDecodeError:
         return {"raw_output": result.stdout}
 
