@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
-from ..models import DidCreateRequest, DidUpdateRequest
+from ..models import DidCreateRequest, DidCreateRestrictedRequest, DidUpdateRequest
 from ..services.oydid import run_oydid_command
 from ..services.qdrant_service import qdrant_service
 import json
@@ -289,6 +289,52 @@ async def create_did(request: DidCreateRequest):
         # Store in Qdrant
         try:
             qdrant_service.upsert_document(did, request.payload, collection=request.collection)
+        except Exception as e:
+            print(f"Warning: Failed to store in Qdrant: {e}")
+            
+        return did_data
+    except json.JSONDecodeError:
+        return {"raw_output": result.stdout}
+
+@router.post("/create/restricted")
+async def create_restricted_did(request: DidCreateRestrictedRequest):
+    """Create a new restricted DID encrypted for a specific target DID"""
+    # 1. Encrypt the payload using the target DID
+    payload_json = json.dumps(request.payload)
+    encrypt_result = run_oydid_command(["encrypt", "--from", request.target_did, "--json-output"], input_data=request.payload)
+    
+    if encrypt_result.returncode != 0:
+        error_detail = getattr(encrypt_result, "error_msg", encrypt_result.stderr)
+        raise HTTPException(status_code=400, detail=f"Encryption failed for target DID {request.target_did}: {error_detail}")
+        
+    try:
+        encrypted_payload = json.loads(encrypt_result.stdout)
+    except json.JSONDecodeError:
+        # If output is not json but a JWE string or something
+        encrypted_payload = {"jwe": encrypt_result.stdout.strip()}
+        
+    # include the restriction metadata
+    final_payload = {
+        "encrypted_data": encrypted_payload,
+        "restricted_to": request.target_did
+    }
+
+    # 2. Create the DID with encrypted payload
+    result = run_oydid_command(["create", "--json-output"], input_data=final_payload)
+    
+    if result.returncode != 0:
+        error_detail = getattr(result, "error_msg", result.stderr)
+        raise HTTPException(status_code=400, detail=f"OYDID Create Error: {error_detail}")
+        
+    try:
+        if request.collection:
+            final_payload["collection"] = request.collection
+
+        did_data = json.loads(result.stdout)
+        did = did_data.get("did")
+        
+        try:
+            qdrant_service.upsert_document(did, final_payload, collection=request.collection)
         except Exception as e:
             print(f"Warning: Failed to store in Qdrant: {e}")
             

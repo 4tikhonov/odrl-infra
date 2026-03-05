@@ -62,9 +62,12 @@ Manage the lifecycle of OYDID Data Resources.
 | Method | Endpoint | Description | Parameters |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/did/create` | **Create DID**. Creates a new DID with a given JSON payload. | Body: `{"payload": {...}, "options": {...}}` |
+| `POST` | `/did/create/restricted` | **Create Restricted DID**. Encrypts payload for a target DID using `oydid encrypt`. | Body: `{"payload": {...}, "target_did": "did:oyd..."}` |
 | `GET` | `/did/create_from_url` | **Bookmark DID**. Creates a DID from a URL, extracting title and metadata. | `?url=...` (Supports `.ttl` for RDF) |
 | `GET` | `/did/share/{did}` | **Resolve/Share**. Resolves a DID and returns its payload (e.g., bookmark data). | `?language=fr` (or `did:oyd:...@fr`) |
 | `GET` | `/did/{did}` | **Read DID**. Resolves the full DID Document. | Path: `did` |
+| `GET` | `/did/resolve/{did}` | **Resolve DID**. Resolves a DID to its full W3C DID Document. | Path: `did` |
+| `GET` | `/did/validate/{did}` | **Validate DID**. Validates a DID and optionally checks if a `public_key` is authorized for it. | `?public_key=...` |
 | `POST` | `/did/update` | **Update DID**. Updates the payload of an existing DID. | Body: `{"did": "...", "payload": {...}}` |
 | `DELETE` | `/did/revoke/{did}` | **Revoke DID**. Revokes a DID, making it invalid. | Path: `did` |
 

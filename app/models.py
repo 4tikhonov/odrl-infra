@@ -5,6 +5,11 @@ class DidCreateRequest(BaseModel):
     payload: Dict[str, Any]
     collection: Optional[str] = None
 
+class DidCreateRestrictedRequest(BaseModel):
+    payload: Dict[str, Any]
+    target_did: str
+    collection: Optional[str] = None
+
 class DidUpdateRequest(BaseModel):
     did: str
     payload: Dict[str, Any]
