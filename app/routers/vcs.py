@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from ..models import GoogleVcRequest, SshVcRequest, GitHubVcRequest, OrcidVcRequest
 from ..services.oydid import run_oydid_command
 from ..services.issuer import get_issuer_did
+import os
 import json
 import subprocess
 import requests
@@ -19,9 +20,11 @@ async def issue_google_vc(request: GoogleVcRequest):
 
     # 1. Verify Google Token
     try:
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
         id_info = id_token.verify_oauth2_token(
             request.token, 
             google_requests.Request(), 
+            audience=client_id,
             clock_skew_in_seconds=10
         )
         email = id_info.get("email")

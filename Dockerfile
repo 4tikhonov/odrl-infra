@@ -4,6 +4,10 @@ WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 COPY frontend ./
+ARG GOOGLE_CLIENT_ID
+ARG REDIRECT_URI
+ENV VITE_GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+ENV VITE_REDIRECT_URI=$REDIRECT_URI
 RUN npm run build
 
 # Stage 2: Backend & Runtime

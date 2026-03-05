@@ -320,9 +320,21 @@ async def read_did(did: str):
         return {"raw_output": result.stdout}
 
 @router.get("/resolve/{did}")
-async def resolve_did_alias(did: str):
-    """Alias for read_did to support older frontend builds or standard resolution paths."""
-    return await read_did(did)
+async def resolve_did(did: str):
+    """Resolve a DID to its full W3C DID Document."""
+    if "&" in did:
+        did = did.split("&")[0]
+
+    result = run_oydid_command(["read", did, "--w3c-did"])
+    
+    if result.returncode != 0:
+        error_detail = getattr(result, "error_msg", result.stderr)
+        raise HTTPException(status_code=404, detail=f"DID not found or error: {error_detail}")
+        
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return {"raw_output": result.stdout}
 
 @router.post("/update")
 async def update_did(request: DidUpdateRequest):
